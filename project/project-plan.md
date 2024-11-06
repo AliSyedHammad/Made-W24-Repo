@@ -1,8 +1,8 @@
 # Project Plan
 
 ## Title
-<!-- Give your project a short title. -->
-Awesome MADE project.
+
+Population, Climate, and Economy disparity in the Americas
 
 ## Main Question
 
@@ -14,20 +14,22 @@ This project analyzes how climate vulnerability correlates with economic develop
 
 ## Datasources
 
-<!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
-
-### Datasource1: WorldBank
+### Datasource1: World Bank CCDR 
 * Metadata URL: https://mobilithek.info/offers/-6901989592576801458
-* Data URL: https://raw.githubusercontent.com/od-ms/radverkehr-zaehlstellen/main/100035541/2019-01.csv
+* Data URL: https://databank.worldbank.org/source/country-climate-and-development-report-(ccdr)
 * Data Type: CSV
+* The CCDR dataset provides data on climate risks, economic resilience, and infrastructure readiness to help countries align development with climate adaptation and sustainability.
 
-Short description of the DataSource.
+### Datasource1: World Bank World Development Indicator 
+* Metadata URL: https://databank.worldbank.org/source/world-development-indicators
+* Data URL: https://databank.worldbank.org/source/world-development-indicators
+* Data Type: CSV
+* The World Bank World Development Indicators (WDI) is a comprehensive dataset offering global economic, social, and environmental data to track development progress and inform policy.
 
 ## Work Packages
 
-<!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
-
-1. Example Issue [#1][i1]
-2. ...
-
-[i1]: https://github.com/jvalue/made-template/issues/1
+1. Data Collection and Cleaning
+2. Data Merging
+3. Exploratory Data Analysis
+4. Insights and Visualizations
+5. Future Predictions
