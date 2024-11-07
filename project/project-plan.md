@@ -2,7 +2,7 @@
 
 ## Title
 
-Population, Climate, and Economy disparity in the Americas
+Are poorer countries more prone to be affected by climate change in the Americas?
 
 ## Main Question
 
