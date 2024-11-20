@@ -1,0 +1,73 @@
+pipeline CountryStatsPipeline {
+
+    CountryStatsExtractor
+        -> CountryStatsXLXSInterpreter
+        -> CountryStatsSheetPicker
+        -> CountryStatsDataSelector;
+
+    CountryStatsDataSelector
+        -> CountryStatsCellsTableInterpreter
+        -> CountryStatsCellsLoader;
+
+    CountryStatsDataSelector
+        -> SecondCountryStatsCellsTableInterpreter
+        -> SecondCountryStatsCellsLoader;
+
+    block CountryStatsExtractor oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+    }
+
+    block CountryStatsXLXSInterpreter oftype XLSXInterpreter { }
+
+    block CountryStatsSheetPicker oftype SheetPicker {
+        sheetName: "Figure S5.1.2";
+    }
+
+    block CountryStatsDataSelector oftype CellRangeSelector {
+        select: range P2:S45;
+    }
+
+    block CountryStatsCellsTableInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "Bond Issuance Share" oftype BIS
+        ];
+    }
+
+    block CountryStatsCellsLoader oftype SQLiteLoader {
+        table: "bondIssuance";
+        file: "./country-stats.sqlite";
+    }
+
+    block SecondCountryStatsCellsTableInterpreter oftype TableInterpreter {
+        header: false;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "GDP per Capita" oftype GDP
+        ];
+    }
+
+    block SecondCountryStatsCellsLoader oftype SQLiteLoader {
+        table: "gdpPerCapita";
+        file: "./country-stats.sqlite";
+    }
+} 
+    valuetype BIS oftype decimal {
+    constraints: [
+        BIS_Valid
+    ];
+}
+    constraint BIS_Valid oftype RangeConstraint {
+    lowerBound: 0;
+    upperBound: 1;
+}
+
+    valuetype GDP oftype decimal {
+    constraints: [
+        GDP_Valid
+    ];
+}
+    constraint GDP_Valid oftype RangeConstraint {
+    lowerBound: 0;
+}
