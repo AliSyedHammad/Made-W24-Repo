@@ -15,8 +15,6 @@ pipeline CountryStatsPipeline {
         -> SecondCountryStatsCellsTableInterpreter
         -> SecondCountryStatsCellsLoader;
 
-
-
     block CountryStatsExtractor oftype HttpExtractor {
         url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
     }
@@ -30,7 +28,6 @@ pipeline CountryStatsPipeline {
     block CountryStatsDataSelector oftype CellRangeSelector {
         select: range P2:S45;
     }
-
 
     block CountryStatsColumnDeleter oftype ColumnDeleter {
         delete: [ column B, column C
@@ -49,14 +46,6 @@ pipeline CountryStatsPipeline {
         table: "bondIssuance";
         file: "./country-stats.sqlite";
     }
-
-    // block SecondCountryStatsSheetPicker oftype SheetPicker {
-    //     sheetName: "Figure S5.1.2";
-    // }
-
-    // block SecondCountryStatsDataSelector oftype CellRangeSelector {
-    //     select: range P2:S45;
-    // }
 
     block SecondCountryStatsColumnDeleter oftype ColumnDeleter {
         delete: [ column B, column D
