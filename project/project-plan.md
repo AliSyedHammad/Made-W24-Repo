@@ -13,19 +13,15 @@ What is the distribution of types of issues faced by the residents of NYC, what 
 The analysis of 311 calls can be of great use for a wide variety of purposes, ranging from a rich understanding of the status of a city to the effectiveness of the government services in addressing such calls.
 
 In this analysis, I want to answer following questions:
-• What are different type of Service Requests? Which is most/least frequent?
-• From which borough most Service Requests come from?
-• How air quality issues relate across the state?
-• Which agencies are more efficient in solving Service Requests?
-• Which Service Requests peaks at what time of year or time of day?
-• From which type of location we get most number of complaints?
+- What are different type of Service Requests? Which is most/least frequent?
+- From which area do most Service Requests come from?
+- Which type of issues are more common?
+- Which agencies are more efficient in solving Service Requests?
+- Which Service Requests peaks at what time of year or time of day?
+- From which type of location do we get the most number of complaints?
+- What is the time required to resolve specific complaints in various areas?
 
-With the above answers, we will have a better understanding of the city’s issue. Our next step will be to predict or find the following:
-• Find out the time required in terms of range of days to resolve a specific
-complaint in a specific borough?
-• Merge the 311 data set with the Storms data set and compare the average response time for complaints during a storm and otherwise.
-
-By using these answers, a city can be better prepared for a particular storm type. Policy makers can use this information to efficiently allocate resources. In addition, the residents of the city can have a real-time sense of when their problem will be solved.
+With the above answers, we will better understand the dynamics of the city’s issues. Our next step will be to find the following merge the 311 data set with the Storms data set and compare the average response time for complaints during a storm and otherwise.
 
 ## Datasources
 
