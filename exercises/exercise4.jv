@@ -1,100 +1,95 @@
-pipeline TempPipeline {
+pipeline Battery {
+    BatteryExtractor
+        -> ZipArchiveInterpreter
+        -> FilePicker
+        -> BatteryTextFileInterpreter
+        -> BatteryCSVInterpreter
+        -> RenameRange
+        -> RenameBatteryTemp
+        -> BatteryTableInterpreter
+        -> TempTransformer
+        -> BatteryTempTransformer
+        -> BatteryLoader;
 
-    TempExtractor
-        -> TZippedInterpreter
-        -> TFilePicker
-        -> TTextFileInterpreter
-        -> TCSVInterpreter 
-        -> TColumnDeleter
-        -> TRowDeleter
-        -> TCellRangeSelector
-        -> TTableInterpreter
-        -> TTransformer
-        -> BatteryTTransformer
-        -> TempLoader;
 
-    block TempExtractor oftype HttpExtractor 
-    {
+
+    block BatteryExtractor oftype HttpExtractor {
         url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
-    } 
-
-    block TZippedInterpreter oftype ArchiveInterpreter 
-    {
-        archiveType: "zip";
-
-    }
-    block TFilePicker oftype FilePicker      
-    {
-        path: "/data.csv";
     }
 
-    block TTextFileInterpreter oftype TextFileInterpreter { encoding: "utf8";}
-    block TCSVInterpreter oftype CSVInterpreter 
-    {
-        delimiter: ";";
-    }
-    
-
-    block TColumnDeleter oftype ColumnDeleter
-    {
-        delete: [column F,column G,column H,column I];
+    block ZipArchiveInterpreter oftype ArchiveInterpreter {
+   archiveType: "zip";
     }
 
-    block TRowDeleter oftype RowDeleter 
-    {
-        delete: [row 1];
+    block FilePicker oftype FilePicker {
+    path: "./data.csv";
     }
 
-    block TCellRangeSelector oftype CellRangeSelector   
-    {
-        select: range A1:F*;
+    block BatteryTextFileInterpreter oftype TextFileInterpreter { } //output -> TextFile
+
+    block BatteryCSVInterpreter oftype CSVInterpreter {  //input -> TextFile, output -> sheet
+        delimiter: ';';
     }
 
-    block TTableInterpreter oftype TableInterpreter 
-    {
-        header : false;
-        columns : [
-            "id" oftype positiveInteger,
-            "producer" oftype text,
-            "model" oftype text,
-            "month" oftype integer,
-            "Temp" oftype decimal,
-            "battery_Temp" oftype decimal,
+    block RenameRange oftype CellWriter {
+        at: range A1:E1;
+        write: ["id", "producer", "model", "month", "temperature"];
+    }
+
+    block RenameBatteryTemp oftype CellWriter {
+        at: cell J1;
+        write: ["battery_temperature"];
+    }
+
+    block BatteryTableInterpreter oftype TableInterpreter { //input -> sheet
+    header: true;
+    columns: [
+        "id" oftype valid_int,
+        "producer" oftype text,
+        "model" oftype text,
+        "month" oftype valid_month,
+        "temperature" oftype decimal,
+        "battery_temperature" oftype decimal,
         ];
     }
 
-    block TempLoader oftype SQLiteLoader 
-    {
-        table: "Temps";
-        file: "./Temps.sqlite";
-    }
-    
-    block TTransformer oftype TableTransformer 
-    {
-        inputColumns: ['Temp'];
-        outputColumn: 'Temp';
-        uses: CelsiusToFahrenheit;
+
+    transform CelsiusToFahrenheit {
+    from Celsius oftype decimal;
+    to Fahrenheit oftype decimal;
+
+    Fahrenheit: (Celsius * 9/5) + 32;
     }
 
-    block BatteryTTransformer oftype TableTransformer 
-    {
-        inputColumns: ['battery_Temp'];
-        outputColumn: 'battery_Temp';
-        uses: CelsiusToFahrenheit;
+    block TempTransformer oftype TableTransformer {
+    inputColumns: ['temperature'];
+    outputColumn: 'temperature';
+    uses: CelsiusToFahrenheit;
     }
 
-    transform CelsiusToFahrenheit 
-    {
-        from tempCelsius oftype decimal;
-        to tempFahrenheit oftype decimal;
-        tempFahrenheit: (tempCelsius * 9/5) + 32;
+    block BatteryTempTransformer oftype TableTransformer {
+    inputColumns: ['battery_temperature'];
+    outputColumn: 'battery_temperature';
+    uses: CelsiusToFahrenheit;
     }
 
-    valuetype positiveInteger oftype integer
-    {
-        constraints: [setPositiveInteger];
+    block BatteryLoader oftype SQLiteLoader {
+        table: "temperatures";
+        file: "./temperatures.sqlite";
     }
-    constraint setPositiveInteger on decimal:
-        value > 0;
 
 }
+
+valuetype valid_int oftype integer {
+  constraints: [
+    Validint
+  ];
+}
+constraint Validint on integer: value >= 0;
+
+valuetype valid_month oftype integer {
+  constraints: [
+    Validmonth
+  ];
+}
+constraint Validmonth on integer: value >= 1 and value <= 12;
