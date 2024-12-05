@@ -1,4 +1,4 @@
-pipeline Battery {
+pipeline BatteryPipeline {
     BatteryExtractor
         -> ZipArchiveInterpreter
         -> FilePicker
@@ -25,9 +25,8 @@ pipeline Battery {
     path: "./data.csv";
     }
 
-    block BatteryTextFileInterpreter oftype TextFileInterpreter { } //output -> TextFile
-
-    block BatteryCSVInterpreter oftype CSVInterpreter {  //input -> TextFile, output -> sheet
+    block BatteryTextFileInterpreter oftype TextFileInterpreter { } 
+    block BatteryCSVInterpreter oftype CSVInterpreter {  
         delimiter: ';';
     }
 
@@ -41,7 +40,7 @@ pipeline Battery {
         write: ["battery_temperature"];
     }
 
-    block BatteryTableInterpreter oftype TableInterpreter { //input -> sheet
+    block BatteryTableInterpreter oftype TableInterpreter { 
     header: true;
     columns: [
         "id" oftype valid_int,
