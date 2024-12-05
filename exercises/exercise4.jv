@@ -1,0 +1,100 @@
+pipeline TempPipeline {
+
+    TempExtractor
+        -> TZippedInterpreter
+        -> TFilePicker
+        -> TTextFileInterpreter
+        -> TCSVInterpreter 
+        -> TColumnDeleter
+        -> TRowDeleter
+        -> TCellRangeSelector
+        -> TTableInterpreter
+        -> TTransformer
+        -> BatteryTTransformer
+        -> TempLoader;
+
+    block TempExtractor oftype HttpExtractor 
+    {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    } 
+
+    block TZippedInterpreter oftype ArchiveInterpreter 
+    {
+        archiveType: "zip";
+
+    }
+    block TFilePicker oftype FilePicker      
+    {
+        path: "/data.csv";
+    }
+
+    block TTextFileInterpreter oftype TextFileInterpreter { encoding: "utf8";}
+    block TCSVInterpreter oftype CSVInterpreter 
+    {
+        delimiter: ";";
+    }
+    
+
+    block TColumnDeleter oftype ColumnDeleter
+    {
+        delete: [column F,column G,column H,column I];
+    }
+
+    block TRowDeleter oftype RowDeleter 
+    {
+        delete: [row 1];
+    }
+
+    block TCellRangeSelector oftype CellRangeSelector   
+    {
+        select: range A1:F*;
+    }
+
+    block TTableInterpreter oftype TableInterpreter 
+    {
+        header : false;
+        columns : [
+            "id" oftype positiveInteger,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype integer,
+            "Temp" oftype decimal,
+            "battery_Temp" oftype decimal,
+        ];
+    }
+
+    block TempLoader oftype SQLiteLoader 
+    {
+        table: "Temps";
+        file: "./Temps.sqlite";
+    }
+    
+    block TTransformer oftype TableTransformer 
+    {
+        inputColumns: ['Temp'];
+        outputColumn: 'Temp';
+        uses: CelsiusToFahrenheit;
+    }
+
+    block BatteryTTransformer oftype TableTransformer 
+    {
+        inputColumns: ['battery_Temp'];
+        outputColumn: 'battery_Temp';
+        uses: CelsiusToFahrenheit;
+    }
+
+    transform CelsiusToFahrenheit 
+    {
+        from tempCelsius oftype decimal;
+        to tempFahrenheit oftype decimal;
+        tempFahrenheit: (tempCelsius * 9/5) + 32;
+    }
+
+    valuetype positiveInteger oftype integer
+    {
+        constraints: [setPositiveInteger];
+    }
+    constraint setPositiveInteger on decimal:
+        value > 0;
+
+}
